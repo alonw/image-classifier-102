@@ -1,6 +1,6 @@
 # image-classifier-102
 
-Project code for Udacity's AI Programming with Python Nanodegree program: an image classifier built with PyTorch, then converted into a command line application.
+I created this project as part of my participation in Udacity's AI Programming with Python Nanodegree program: an image classifier built with PyTorch, then converted into a command line application.
 
 The image classifier is built with pytorch that classifies a flower image to it's category. The classifier currently has training, validation, and test data for 102 flowers and uses transfer learning with either VGG19 or Densenet161 to train and infer with.
 
