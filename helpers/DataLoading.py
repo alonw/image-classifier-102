@@ -41,7 +41,7 @@ def load_image_and_data(data_dir="flower_data", batch_size=32):
     # TODO: Using the image datasets and the trainforms, define the dataloaders
     # dataloaders = {}
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size, shuffle=True)
-    validate_dataloader = torch.utils.data.DataLoader(validate_dataset, batch_size, shuffle=False)
+    validate_dataloader = torch.utils.data.DataLoader(validate_dataset, batch_size, shuffle=True)
     test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size, shuffle=True)
 
     # print('############ about to print dataloader[training] #######')

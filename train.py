@@ -52,7 +52,7 @@ print(args)
 print("in train.py data_dir is " + data_dir)
 train_dataloader, validate_dataloader, test_dataloader= helpers.DataLoading.load_image_and_data(data_dir, 32)
 # print(data_loaders)
-model, criterion, optimizer = helpers.NeuralNetUtils.create_model(arch, hidden_units,learning_rate)
+model, criterion, optimizer = helpers.NeuralNetUtils.create_model(arch, hidden_units,learning_rate, gpu_or_cpu)
 helpers.NeuralNetUtils.train(model, epochs, learning_rate, criterion, optimizer, train_dataloader, validate_dataloader, gpu_or_cpu)
 helpers.NeuralNetUtils.save_model(model, datasets, learning_rate, epochs, criterion, optimizer, hidden_units, arch, 32)
 

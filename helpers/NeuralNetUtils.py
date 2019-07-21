@@ -7,7 +7,7 @@ from torch.optim import lr_scheduler
 from torch.autograd import Variable
 from collections import OrderedDict
 
-def create_model(arch="vgg19", hidden_units=4096, learning_rate=0.01):
+def create_model(arch="vgg19", hidden_units=4096, learning_rate=0.01, gpu_or_cpu="cpu"):
     '''
         Create the model using the desired archtecture and layers. 
 
@@ -39,9 +39,6 @@ def create_model(arch="vgg19", hidden_units=4096, learning_rate=0.01):
                           ('output', nn.LogSoftmax(dim=1))
                           ]))
     
-    for param in model.parameters():
-        param.requires_grad = False
-
     model.classifier = classifier
     
     # epochs = 1
@@ -49,7 +46,10 @@ def create_model(arch="vgg19", hidden_units=4096, learning_rate=0.01):
     criterion = nn.NLLLoss()
     optimizer = optim.Adam(model.classifier.parameters(), lr=learning_rate)
     #model.load_state_dict(checkpoint['state_dict'])
-    
+
+    if torch.cuda.is_available() and gpu_or_cpu == 'gpu':
+        model.cuda()
+   
     print("Model suceesfuly created, yey!")
     return model, criterion, optimizer
 
@@ -87,6 +87,8 @@ def save_model(model, datasets, learning_rate, epochs, criterion, optimizer, hid
                 'state_dict': model.state_dict(),
                 'class_to_idx': model.class_to_idx
     }
+
+    print(checkpoint)
 
     torch.save(checkpoint,  'checkpoint.pth')
     print("Model successfuly saved")
