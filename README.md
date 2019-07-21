@@ -1,4 +1,4 @@
-# image-classifier-102
+# Flower Image Classifier
 
 I created this project as part of my participation in Udacity's AI Programming with Python Nanodegree program: an image classifier built with PyTorch, then converted into a command line application.
 
@@ -12,7 +12,7 @@ Tools are packages: Python, Numpy, Pytorch, Torchvision, Matplotlib
 3. Once the model is ready, it's saved and validated
 4. Prediction uses the trained network and returns the most probable flower classifications (ordered). 
 
-
+*This repository also includes a Jupyter notebook version of the project. 
 
 ## Licence
 [MIT](https://opensource.org/licenses/MIT)

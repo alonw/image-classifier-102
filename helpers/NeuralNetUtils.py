@@ -115,16 +115,18 @@ def load_model(checkpoint_path='checkpoint.pth'):
         
     return model
 
+#def train(model, epochs, learning_rate, criterion, optimizer, training_loader, validation_loader):
+def train(model, epochs, learning_rate, criterion, optimizer, train_data_loader, validate_data_loader, gpu_or_cpu):
+    print("train")
 
-def train_model(model, epochs, learning_rate, criterion, optimizer, training_loader, validation_loader):
     model.train() # Puts model into training mode
     print_every = 20
     steps = 0
-    use_gpu = True
+    # use_gpu = True
     
     # Check to see whether GPU is available
-    if torch.cuda.is_available():
-        use_gpu = True
+    if (gpu_or_cpu == "gpu" and torch.cuda.is_available() ):
+        # use_gpu = True
         model.cuda()
     else:
         model.cpu()
@@ -132,17 +134,13 @@ def train_model(model, epochs, learning_rate, criterion, optimizer, training_loa
     # Iterates through each training pass based on #epochs & GPU/CPU
     for epoch in range(epochs):
         running_loss = 0
-        for inputs, labels in iter(training_loader):
+        # for inputs, labels in iter(training_loader):
+        for inputs, labels in iter(train_data_loader):
             steps += 1
 
-            if use_gpu:
-                inputs = Variable(inputs.float().cuda())
-                labels = Variable(labels.long().cuda()) 
-            else:
-                inputs = Variable(inputs)
-                labels = Variable(labels) 
+            if torch.cuda.is_available() and gpu_or_cpu =='gpu':
+                inputs, labels = inputs.to('cuda'), labels.to('cuda')
 
-            # Forward and backward passes
             optimizer.zero_grad() # zero's out the gradient, otherwise will keep adding
             output = model.forward(inputs) # Forward propogation
             loss = criterion(output, labels) # Calculates loss
@@ -151,7 +149,8 @@ def train_model(model, epochs, learning_rate, criterion, optimizer, training_loa
             running_loss += loss.item()
 
             if steps % print_every == 0:
-                validation_loss, accuracy = validate(model, criterion, validation_loader)
+                # validation_loss, accuracy = validate(model, criterion, validation_loader)
+                validation_loss, accuracy = validate(model, criterion, validate_data_loader)
 
                 print("Epoch: {}/{} ".format(epoch+1, epochs),
                         "Training Loss: {:.3f} ".format(running_loss/print_every),
@@ -166,6 +165,7 @@ def predict(image_path, model, topk=5):
     '''
     
     # TODO: Implement the code to predict the class from an image file
+    from helpers.ImageProcessing import process_image
     processed_image = process_image(image_path)
     processed_image.unsqueeze_(0)
     probs = torch.exp(model.forward(processed_image))
@@ -189,3 +189,26 @@ def predict(image_path, model, topk=5):
 def sanity_check():
 
     return ''
+
+
+def validate(model, criterion, data_loader):
+    model.eval() # Puts model into validation mode
+    accuracy = 0
+    test_loss = 0
+    
+    with torch.no_grad():
+        for inputs, labels in iter(data_loader):
+            if torch.cuda.is_available():
+                inputs = Variable(inputs.float().cuda())
+                labels = Variable(labels.long().cuda()) 
+            else:
+                inputs = Variable(inputs)
+                labels = Variable(labels)
+
+            output = model.forward(inputs)
+            test_loss += criterion(output, labels).item()
+            ps = torch.exp(output).data 
+            equality = (labels.data == ps.max(1)[1])
+            accuracy += equality.type_as(torch.FloatTensor()).mean()
+
+    return test_loss/len(data_loader), accuracy/len(data_loader)
